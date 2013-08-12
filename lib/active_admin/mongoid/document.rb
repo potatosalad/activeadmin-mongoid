@@ -5,29 +5,29 @@ module ActiveAdmin::Mongoid::Document
   extend ActiveSupport::Concern
 
 
-  # INSTANCE METHODS
+  # # INSTANCE METHODS
 
-  # Returns the column object for the named attribute.
-  def column_for_attribute(name)
-    self.class.columns_hash[name.to_s]
-  end
-
-
+  # # Returns the column object for the named attribute.
+  # def column_for_attribute(name)
+  #   self.class.columns_hash[name.to_s]
+  # end
 
 
-  # PROXY CLASSES
 
-  class ColumnWrapper < SimpleDelegator
-    def type
-      _super = super
-      case _super
-      when Moped::BSON::ObjectId, Object
-        :string
-      else
-        p _super.name.underscore.to_sym
-      end
-    end
-  end
+
+  # # PROXY CLASSES
+
+  # class ColumnWrapper < SimpleDelegator
+  #   def type
+  #     _super = super
+  #     case _super
+  #     when Moped::BSON::ObjectId, Object
+  #       :string
+  #     else
+  #       p _super.name.underscore.to_sym
+  #     end
+  #   end
+  # end
 
   class Connection
     def initialize model
@@ -42,69 +42,70 @@ module ActiveAdmin::Mongoid::Document
 
 
 
-  # CLASS METHODS
+  # # CLASS METHODS
 
-  included do
-    unless respond_to? :primary_key
-      class << self
-        attr_accessor :primary_key
-      end
-    end
+  # included do
+  #   unless respond_to? :primary_key
+  #     class << self
+  #       attr_accessor :primary_key
+  #     end
+  #   end
 
-    self.primary_key ||= [:_id]
+  #   self.primary_key ||= [:_id]
 
-  end
+  # end
 
   module ClassMethods
 
-    # Metasearch
+    # # Metasearch
 
-    def joins_values *args
-      scoped
-    end
+    # def joins_values *args
+    #   scoped
+    # end
 
-    def group_by *args
-      scoped
-    end
-
-
-
-    # Cache
-
-    def [] name
-      raise name.inspect
-      cache[name]
-    end
-
-    def []= name, value
-      cache[name]= value
-    end
-
-    def cache
-      @cache ||= {}
-    end
+    # def group_by *args
+    #   scoped
+    # end
 
 
-    # Columns
 
-    def content_columns
-      # cannot cache this, since changes in time (while defining fields)
-      fields.map(&:second).reject do |f|
-        f.name =~ /(^_|^(created|updated)_at)/ or Mongoid::Fields::ForeignKey === f
-      end
-    end
+    # # Cache
 
-    def columns
-      @columns ||= fields.map(&:second).map{ |c| ColumnWrapper.new(c) }
-    end
+    # def [] name
+    #   raise name.inspect
+    #   cache[name]
+    # end
+
+    # def []= name, value
+    #   cache[name]= value
+    # end
+
+    # def cache
+    #   @cache ||= {}
+    # end
+
+
+    # # Columns
+
+    # def content_columns
+    #   # cannot cache this, since changes in time (while defining fields)
+    #   fields.map(&:second).reject do |f|
+    #     f.name =~ /(^_|^(created|updated)_at)/ or Mongoid::Fields::ForeignKey === f
+    #   end
+    # end
+
+    # def columns
+    #   @columns ||= fields.map(&:second).map{ |c| ColumnWrapper.new(c) }
+    # end
 
     def column_names
-      @column_names ||= fields.map(&:first)
+      fields.map(&:first)
+      # @column_names ||= fields.map(&:first)
     end
 
-    def columns_hash
-      columns.index_by(&:name)
-    end
+    # def columns_hash
+    #   columns.index_by(&:name)
+    # end
 
 
 
@@ -116,18 +117,18 @@ module ActiveAdmin::Mongoid::Document
       @connection ||= Connection.new(self)
     end
 
-    def find_by_id id
-      find_by(:_id => id)
-    end
+    # def find_by_id id
+    #   find_by(:_id => id)
+    # end
 
-    def quoted_table_name
-      collection_name.to_s.inspect
-    end
+    # def quoted_table_name
+    #   collection_name.to_s.inspect
+    # end
 
 
-    def reflections *a
-      relations *a
-    end
+    # def reflections *a
+    #   relations *a
+    # end
   end
 end
 
